@@ -1,0 +1,4 @@
+name        = Cookiebot
+description = Drupal Cookiebot integration. Cookie consent, Cookie monitoring and Cookie control.
+core        = 7.x
+configure   = admin/config/system/cookiebot
