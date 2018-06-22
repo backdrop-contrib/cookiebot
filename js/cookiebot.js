@@ -14,12 +14,13 @@
   Drupal.behaviors.cookiebot = {
     attach: function attach(context) {
       $('.cookiebot-renew', context).once().on('click', function (event) {
+        event.preventDefault();
+
         if (typeof Cookiebot === 'undefined') {
           return;
         }
 
         Cookiebot.renew();
-        event.preventDefault();
       });
     }
   };
@@ -41,12 +42,18 @@
       ];
 
       $.each(cookieNames, function (index, cookieName) {
-        if (Cookiebot.consent[cookieName] === true) {
-          jQuery.cookie('cookiebot-consent--' + cookieName, 1);
+        if (Cookiebot.consent[cookieName] === true && $.cookie('cookiebot-consent--' + cookieName) !== '1') {
+          $.cookie('cookiebot-consent--' + cookieName, '1', {
+            path: '/'
+          });
           return;
         }
 
-        jQuery.cookie('cookiebot-consent--' + cookieName, 0);
+        if (Cookiebot.consent[cookieName] === false && $.cookie('cookiebot-consent--' + cookieName) !== '0') {
+          $.cookie('cookiebot-consent--' + cookieName, '0', {
+            path: '/'
+          });
+        }
       });
     }
   };
