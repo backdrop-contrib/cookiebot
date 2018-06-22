@@ -42,7 +42,7 @@ via the 'Modules' admin interface.
 1. Visit /admin/config/system/cookiebot
 1. Set your _Domain Group ID_.
 1. You can optionally display the full cookie declaration on a specific node
-   page.
+   page or place our block via admin/structure/block (Panels supported).
 
 ### Cookiebot renew
 

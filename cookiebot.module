@@ -145,3 +145,41 @@ function cookiebot_preprocess_menu_link(&$variables) {
   $variables['element']['#href'] = '/';
   $variables['element']['#localized_options']['attributes']['class'][] = 'cookiebot-renew';
 }
+
+/**
+ * Implements hook_block_info().
+ */
+function cookiebot_block_info() {
+  $blocks = array();
+
+  $blocks['cookiebot_declaration'] = array(
+    'info' => t('Cookiebot declaration'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function cookiebot_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'cookiebot_declaration':
+      $cbid = variable_get('cookiebot_cbid', '');
+
+      if (empty($cbid)) {
+        break;
+      }
+
+      $block['content'] = array(
+        '#theme' => 'cookiebot_declaration',
+        '#cookiebot_src' => 'https://consent.cookiebot.com/' . $cbid . '/cd.js',
+      );
+    break;
+  }
+
+  return $block;
+}
