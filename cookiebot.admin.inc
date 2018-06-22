@@ -19,11 +19,17 @@
  * @see system_settings_form_submit()
  */
 function cookiebot_settings_form(array $form, array &$form_state) {
+  $cbid = variable_get('cookiebot_cbid', '');
+
+  if (empty($cbid)) {
+    drupal_set_message(t('Cookiebot functionality is disabled until you enter a valid CBID.'), 'warning');
+  }
+
   $form['cookiebot_cbid'] = array(
     '#type' => 'textfield',
     '#title' => t('Your cookiebot Domain Group ID (CBID)'),
     '#description' => t("This ID looks like 00000000-0000-0000-0000-000000000000. You can find it in the <a href='https://www.cookiebot.com/en/manage'>Cookiebot Manager</a> on the 'Your scripts' tab."),
-    '#default_value' => variable_get('cookiebot_cbid', ''),
+    '#default_value' => $cbid,
   );
 
   $show_declaration = variable_get('cookiebot_show_declaration', FALSE);
@@ -79,11 +85,16 @@ function cookiebot_settings_form_validate(array $form, array &$form_state) {
   $cbid_trimmed = trim($form_state['values']['cookiebot_cbid']);
   $form_state['values']['cookiebot_cbid'] = $cbid_trimmed;
 
-  if (!preg_match('/^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$/', $cbid_trimmed)) {
+  if (!empty($cbid_trimmed) && !preg_match('/^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$/', $cbid_trimmed)) {
     form_set_error('cookiebot_cbid', t('The entered Domain Group ID is not formatted correctly.'));
   }
 
   if (!empty($form_state['values']['cookiebot_show_declaration_node_id']) && !node_load($form_state['values']['cookiebot_show_declaration_node_id'])) {
     form_set_error('cookiebot_show_declaration_node_id', t('The entered node ID is invalid.'));
   }
+
+  // Clear caches like the system_performance_settings() form does.
+  drupal_clear_css_cache();
+  drupal_clear_js_cache();
+  cache_clear_all('*', 'cache_page', TRUE);
 }
