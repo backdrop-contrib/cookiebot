@@ -129,7 +129,6 @@ function cookiebot_form_menu_edit_item_alter(&$form, &$form_state) {
     return;
   }
 
-  $form['link_path']['#default_value'] = $form['link_path']['#default_value'];
   $form['link_path']['#description'] .= ' ' . t("Enter '%cookiebot-renew' to generate a link to renew Cookiebot's cookie consent status.", array('%cookiebot-renew' => '<cookiebot-renew>'));
 }
 
