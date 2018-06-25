@@ -18,7 +18,7 @@
  *
  * @see system_settings_form_submit()
  */
-function cookiebot_settings_form(array $form, array &$form_state) {
+function cookiebot_settings_form($form, &$form_state) {
   $cbid = variable_get('cookiebot_cbid', '');
 
   if (empty($cbid)) {
@@ -28,7 +28,7 @@ function cookiebot_settings_form(array $form, array &$form_state) {
   $form['cookiebot_cbid'] = array(
     '#type' => 'textfield',
     '#title' => t('Your cookiebot Domain Group ID (CBID)'),
-    '#description' => t("This ID looks like 00000000-0000-0000-0000-000000000000. You can find it in the <a href='https://www.cookiebot.com/en/manage'>Cookiebot Manager</a> on the 'Your scripts' tab."),
+    '#description' => t("This ID looks like 00000000-0000-0000-0000-000000000000. You can find it in the <a href='@url'>Cookiebot Manager</a> on the 'Your scripts' tab.", array('@url' => 'https://www.cookiebot.com/en/manage')),
     '#default_value' => $cbid,
   );
 
@@ -37,7 +37,7 @@ function cookiebot_settings_form(array $form, array &$form_state) {
   $form['cookiebot_declaration'] = array(
     '#type' => 'fieldset',
     '#title' => t('Cookie declaration'),
-    '#attributes' => array('class' => array('collapsible')),
+    '#collapsible' => TRUE,
   );
 
   if (!$show_declaration) {
@@ -46,7 +46,9 @@ function cookiebot_settings_form(array $form, array &$form_state) {
 
   $description = t('Automatically show the full Cookiebot cookie declaration on the given page.');
   $description .= '<br />';
-  $description .= t("Note that custom templates and modules like Panels and Display Suite can prevent the declaration from showing up. You can always manually place Cookiebot's declaration script found in their manager if your input filters allow it.");
+  $description .= t("Note that custom templates and modules like Panels and Display Suite can prevent the declaration from showing up.
+  You can always place our block or manually place Cookiebot's declaration script found in their manager if your input filters allow it.");
+
   $form['cookiebot_declaration']['cookiebot_show_declaration'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show the Cookiebot cookie declaration'),
@@ -68,8 +70,6 @@ function cookiebot_settings_form(array $form, array &$form_state) {
     ),
   );
 
-  drupal_add_library('system', 'drupal.collapse');
-
   return system_settings_form($form);
 }
 
@@ -81,7 +81,7 @@ function cookiebot_settings_form(array $form, array &$form_state) {
  * @param array $form_state
  *   The current state of the form.
  */
-function cookiebot_settings_form_validate(array $form, array &$form_state) {
+function cookiebot_settings_form_validate($form, &$form_state) {
   $cbid_trimmed = trim($form_state['values']['cookiebot_cbid']);
   $form_state['values']['cookiebot_cbid'] = $cbid_trimmed;
 

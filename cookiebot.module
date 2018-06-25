@@ -8,7 +8,7 @@
 /**
  * Implements hook_help().
  */
-function cookiebot_help($path, array $arg) {
+function cookiebot_help($path, $arg) {
   if ($path !== 'admin/help#cookiebot') {
     return '';
   }
@@ -36,8 +36,12 @@ function cookiebot_menu() {
     'file' => 'cookiebot.admin.inc',
   );
 
+  // Add a special menu item for the JavaScript powered Cookiebot renew link.
+  // This is not a page that can be visited, but this item makes it possible
+  // to place this special link in Drupal's menus.
   $items['<cookiebot-renew>'] = array(
     'page callback' => 'drupal_not_found',
+    // Since this is a JavaScript only link everybody has access.
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -96,7 +100,7 @@ JS;
 /**
  * Implements hook_node_view_alter().
  */
-function cookiebot_node_view_alter(array &$build) {
+function cookiebot_node_view_alter(&$build) {
   $nid = $build['#node']->nid;
   $declaration_node_id = variable_get('cookiebot_show_declaration_node_id', '');
   $cbid = variable_get('cookiebot_cbid', '');
@@ -118,24 +122,19 @@ function cookiebot_node_view_alter(array &$build) {
 }
 
 /**
- * Implements hook_form_FROM_ID_alter().
+ * Implements hook_form_FROM_ID_alter() for menu_edit_item().
  */
 function cookiebot_form_menu_edit_item_alter(&$form, &$form_state) {
   if (!isset($form['link_path']['#default_value'])) {
     return;
   }
-  $default_value = $form['link_path']['#default_value'];
 
-  if (preg_match('/^<cookiebot-renew>\/[0-9]+$/', $default_value)) {
-    $default_value = '<cookiebot-renew>';
-  }
-
-  $form['link_path']['#default_value'] = $default_value;
-  $form['link_path']['#description'] .= ' ' . t("Enter '%cookiebot-renew' to generate a linkt to renew Cookiebot's cookie consent status.", array('%cookiebot-renew' => '<cookiebot-renew>'));
+  $form['link_path']['#default_value'] = $form['link_path']['#default_value'];
+  $form['link_path']['#description'] .= ' ' . t("Enter '%cookiebot-renew' to generate a link to renew Cookiebot's cookie consent status.", array('%cookiebot-renew' => '<cookiebot-renew>'));
 }
 
 /**
- * Implements hook_preprocess_HOOK().
+ * Implements hook_preprocess_HOOK() for menu_link().
  */
 function cookiebot_preprocess_menu_link(&$variables) {
   if (empty($variables['element']['#href']) || $variables['element']['#href'] !== '<cookiebot-renew>') {
@@ -178,7 +177,7 @@ function cookiebot_block_view($delta = '') {
         '#theme' => 'cookiebot_declaration',
         '#cookiebot_src' => 'https://consent.cookiebot.com/' . $cbid . '/cd.js',
       );
-    break;
+      break;
   }
 
   return $block;
