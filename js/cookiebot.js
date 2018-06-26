@@ -6,6 +6,21 @@
 (function ($, Drupal) {
   'use strict';
 
+  var $window = $(window);
+
+  /**
+   * Capitalize the first character of a given string.
+   *
+   * @param {string} string
+   *   The string to capitalize the first character of.
+   *
+   * @return {string}
+   *   The string with the first letter capitalized.
+   */
+  var capitalizeFirstCharacter = function (string) {
+    return string[0].toUpperCase() + string.substr(1);
+  };
+
   /**
    * Attach Cookiebot renew click event listener.
    *
@@ -21,6 +36,7 @@
         }
 
         Cookiebot.renew();
+        $window.trigger('cookiebotConsentRenew');
       });
     }
   };
@@ -46,6 +62,7 @@
           $.cookie('cookiebot-consent--' + cookieName, '1', {
             path: '/'
           });
+          $window.trigger('cookiebotConsentAccept' + capitalizeFirstCharacter(cookieName));
           return;
         }
 
@@ -53,6 +70,7 @@
           $.cookie('cookiebot-consent--' + cookieName, '0', {
             path: '/'
           });
+          $window.trigger('cookiebotConsentDecline' + capitalizeFirstCharacter(cookieName));
         }
       });
     }
