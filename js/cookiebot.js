@@ -7,6 +7,7 @@
   'use strict';
 
   var $window = $(window);
+  var renewConsentTriggerEventName = 'cookiebotConsentRenew';
 
   /**
    * Capitalize the first character of a given string.
@@ -21,6 +22,14 @@
     return string[0].toUpperCase() + string.substr(1);
   };
 
+  $window.on(renewConsentTriggerEventName, function () {
+    if (typeof Cookiebot === 'undefined') {
+      return;
+    }
+
+    Cookiebot.renew();
+  });
+
   /**
    * Attach Cookiebot renew click event listener.
    *
@@ -31,12 +40,7 @@
       $('.cookiebot-renew', context).once().on('click', function (event) {
         event.preventDefault();
 
-        if (typeof Cookiebot === 'undefined') {
-          return;
-        }
-
-        Cookiebot.renew();
-        $window.trigger('cookiebotConsentRenew');
+        $window.trigger(renewConsentTriggerEventName);
       });
     }
   };
