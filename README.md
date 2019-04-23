@@ -25,6 +25,9 @@ development of this module.
 
 Then, grab your _Domain Group ID_ (CBID) from the 'Your scripts' tab.
 
+This module will only run with jQuery 1.9 and higher and thus needs the
+jQuery Update module.
+
 ## INSTALLATION
 
 Install this as any other Drupal module
