@@ -91,7 +91,7 @@ function cookiebot_page_alter(&$page) {
   // therefor this is the only way to achieve this.
   // See https://www.drupal.org/project/drupal/issues/1664602.
   $script = <<<JS
-  jQuery('script').last().replaceWith('<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="$cbid" type="text/javascript" async></script>');
+  jQuery('script').last().replaceWith('<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="$cbid" type="text/javascript" async>');
 JS;
   drupal_add_js($script, array('type' => 'inline'));
   drupal_add_js(drupal_get_path('module', 'cookiebot') . '/js/cookiebot.js');
