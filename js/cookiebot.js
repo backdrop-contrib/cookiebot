@@ -22,6 +22,27 @@
     return string[0].toUpperCase() + string.substr(1);
   };
 
+  /**
+   * Listens to event of a user accepting the use of cookies.
+   *
+   * This is also called on every page load when cookies are already accepted.
+   */
+  $window.on('CookiebotOnAccept', function () {
+    Drupal.cookiebot.updateCookies();
+  });
+
+  /**
+   * Listens to the event of a user declining the use of cookies.
+   *
+   * This is also called on every page load when cookies are already declined.
+   */
+  $window.on('CookiebotOnDecline', function () {
+    Drupal.cookiebot.updateCookies();
+  });
+
+  /**
+   * Listens to event of a user wanting to change their cookies consent.
+   */
   $window.on(renewConsentTriggerEventName, function () {
     if (typeof Cookiebot === 'undefined') {
       return;
@@ -37,6 +58,8 @@
    */
   Drupal.behaviors.cookiebot = {
     attach: function attach(context) {
+      Drupal.cookiebot.updateCookies();
+
       $('.cookiebot-renew', context).once().on('click', function (event) {
         event.preventDefault();
 
@@ -61,6 +84,10 @@
         'marketing'
       ];
 
+      if (Cookiebot.consent === void (0)) {
+        return;
+      }
+
       $.each(cookieNames, function (index, cookieName) {
         if (Cookiebot.consent[cookieName] === true && $.cookie('cookiebot-consent--' + cookieName) !== '1') {
           $.cookie('cookiebot-consent--' + cookieName, '1', {
@@ -80,26 +107,4 @@
     }
   };
 
-})(jQuery, Drupal);
-
-/* eslint-disable no-unused-vars, strict */
-
-/**
- * The asynchronous callback when the user accepts the use of cookies.
- *
- * This is also called on every page load when cookies are already accepted.
- */
-function CookiebotCallback_OnAccept() {
-  Drupal.cookiebot.updateCookies();
-}
-
-/**
- * The asynchronous callback when the user declines the use of cookies.
- *
- * This is also called on every page load when cookies are already declined.
- */
-function CookiebotCallback_OnDecline() {
-  Drupal.cookiebot.updateCookies();
-}
-
-/* eslint-enable no-unused-vars, strict */
+})(jQuery, Drupal, window);
