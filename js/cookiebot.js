@@ -84,7 +84,7 @@
         'marketing'
       ];
 
-      if (Cookiebot.consent === void (0)) {
+      if (typeof Cookiebot === 'undefined' || Cookiebot.consent === void (0)) {
         return;
       }
 
