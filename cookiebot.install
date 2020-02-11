@@ -15,3 +15,16 @@ function cookiebot_uninstall() {
 
   cache_clear_all('variables', 'cache_bootstrap');
 }
+
+
+/**
+ * Update configuration keys.
+ */
+function cookiebot_update_7001() {
+   // Set defaults for new variables
+  variable_set('cookiebot_block_cookies', TRUE);
+  variable_set('cookiebot_iab_enabled', FALSE);
+  variable_set('cookiebot_exclude_paths', '');
+  variable_set('cookiebot_exclude_admin_theme', FALSE);
+  variable_set('cookiebot_exclude_uid_1', FALSE);
+}

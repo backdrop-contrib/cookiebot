@@ -32,6 +32,23 @@ function cookiebot_settings_form($form, &$form_state) {
     '#default_value' => $cbid,
   );
 
+  $form['cookiebot_block_cookies'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Automatically block all cookies'),
+    '#description' => t('Defines if Cookiebot should <a href="@automatic_url">automatically block all cookies</a> until a user has consented. If not set, cookie-setting scripts should manually be marked up as described in the <a href="@manual_url">manual implementation guide</a>.', [
+      '@automatic_url' => 'https://www.cookiebot.com/en/automatic-cookie-control/',
+      '@manual_url' => 'https://www.cookiebot.com/en/manual-implementation/',
+    ]),
+    '#default_value' => variable_get('cookiebot_block_cookies', TRUE),
+  ];
+
+  $form['cookiebot_iab_enabled'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Enabling IAB framework'),
+    '#description' => t('IAB (Interactive Advertising Bureau) model puts scripts control in the hands of advertisers and vendors by only signaling consent to vendors. More information about <a href="https://support.cookiebot.com/hc/en-us/articles/360007652694-Cookiebot-and-the-IAB-Consent-Framework">Cookiebot and the IAB Consent Framework</a>.'),
+    '#default_value' => variable_get('cookiebot_iab_enabled'),
+  ];
+
   $show_declaration = variable_get('cookiebot_show_declaration', FALSE);
 
   $form['cookiebot_declaration'] = array(
@@ -69,6 +86,34 @@ function cookiebot_settings_form($form, &$form_state) {
       ),
     ),
   );
+
+  $form['visibility'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Cookiebot visibility'),
+  ];
+
+  $form['visibility']['cookiebot_exclude_paths'] = [
+    '#type' => 'textarea',
+    '#title' => t('Exclude paths'),
+    '#default_value' => variable_get('cookiebot_exclude_paths', ''),
+    '#description' => t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.", [
+      '%blog' => '/blog',
+      '%blog-wildcard' => '/blog/*',
+      '%front' => '<front>',
+    ]),
+  ];
+
+  $form['visibility']['cookiebot_exclude_admin_theme'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Exclude admin pages'),
+    '#default_value' => variable_get('cookiebot_exclude_admin_theme', FALSE),
+  ];
+
+  $form['visibility']['cookiebot_exclude_uid_1'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Don’t show the Cookiebot for UID 1.'),
+    '#default_value' => variable_get('cookiebot_exclude_uid_1', FALSE)
+  ];
 
   return system_settings_form($form);
 }

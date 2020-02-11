@@ -58,6 +58,10 @@ function cookiebot_permission() {
       'title' => t('Administer Cookiebot Settings'),
       'description' => t('Allows users to administer Cookiebot settings.'),
     ),
+    'skip cookiebot consent' => array(
+      'title' => t('Can use the site without giving Cookiebot cookie consent'),
+      'description' => t('Allows users to use the site without giving Cookiebot cookie consent.'),
+    ),
   );
 }
 
@@ -79,22 +83,87 @@ function cookiebot_theme($existing, $type, $theme, $path) {
  * Implements hook_page_alter().
  */
 function cookiebot_page_alter(&$page) {
-  $cbid = variable_get('cookiebot_cbid', '');
+  if (!_cookiebot_visible()) {
+    return;
+  }
+  drupal_add_js(drupal_get_path('module', 'cookiebot') . '/js/cookiebot.js');
+}
 
-  if (empty($cbid)) {
+function cookiebot_preprocess_html(&$variables)
+{
+  if(!_cookiebot_visible()) {
     return;
   }
 
-  // We insert a placeholder script that sets its own attribute when the
-  // document is loaded.
-  // Currently drupal_add_js() does not support custom script attributes, and
-  // therefor this is the only way to achieve this.
-  // See https://www.drupal.org/project/drupal/issues/1664602.
-  $script = <<<JS
-  jQuery('script').last().replaceWith('<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="$cbid" type="text/javascript" async>');
-JS;
-  drupal_add_js($script, array('type' => 'inline'));
-  drupal_add_js(drupal_get_path('module', 'cookiebot') . '/js/cookiebot.js');
+  $cbid = variable_get('cookiebot_cbid', '');
+  $attributes = [
+    'id' => 'Cookiebot',
+    'src' => 'https://consent.cookiebot.com/uc.js',
+    'data-cbid' => check_plain($cbid),
+  ];
+
+  if(variable_get('cookiebot_block_cookies')){
+    $attributes['data-blockingmode'] = 'auto';
+  } else {
+    $attributes['async'] = 'async';
+  }
+
+  if(variable_get('cookiebot_iab_enabled')){
+    $attributes['data-framework'] = 'IAB';
+  }
+
+  $cookiebot = array(
+      '#type' => 'markup',
+      '#markup' => '<script type="text/javascript" ' . drupal_attributes($attributes) . '></script>' . "\n",
+      '#weight' => -1001,
+  );
+  drupal_add_html_head($cookiebot, 'cookiebot_banner');
+}
+
+/**
+ * Helper function which returns true if cookiebot applies to the current page / session or false if true.
+ * Checks for visibulity settings, permissions and other relevant criteria.
+ *
+ * @return void
+ */
+function _cookiebot_visible(){
+  global $user;
+
+  $cbid = variable_get('cookiebot_cbid', '');
+  if (empty($cbid)) {
+    return FALSE;
+  }
+
+  // Check hide if user can use site without giving Cookiebot cookie consent.
+  if ($user->uid != 1 && user_access('skip cookiebot consent')) {
+    return FALSE;
+  }
+
+  // Check hide cookie for the superuser.
+  if ($user->uid == 1 && variable_get('cookiebot_exclude_uid_1', FALSE)) {
+    return FALSE;
+  }
+
+  // Check exclude paths.
+  $cookiebot_exclude_paths = variable_get('cookiebot_exclude_paths', '');
+  if (!empty($cookiebot_exclude_paths)) {
+    $path = drupal_strtolower(drupal_get_path_alias($_GET['q']));
+    // Compare the lowercase internal and lowercase path alias (if any).
+    $page_match = drupal_match_path($path, $cookiebot_exclude_paths);
+    if ($path != $_GET['q']) {
+      $page_match = $page_match || drupal_match_path($_GET['q'], $cookiebot_exclude_paths);
+    }
+    if($page_match){
+      return FALSE;
+    }
+  }
+
+  // Check hide cookie compliance on admin theme.
+  if (variable_get('cookiebot_exclude_admin_theme', FALSE) && path_is_admin(current_path())) {
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 /**
@@ -106,7 +175,7 @@ function cookiebot_node_view_alter(&$build) {
   $cbid = variable_get('cookiebot_cbid', '');
 
   if (
-    $nid !== $declaration_node_id ||
+    $nid != $declaration_node_id ||
     $build['#view_mode'] !== 'full' ||
     empty($cbid) ||
     !variable_get('cookiebot_show_declaration', FALSE)

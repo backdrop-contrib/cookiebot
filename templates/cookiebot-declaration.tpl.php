@@ -9,5 +9,4 @@
  *   JavaScript file.
  */
 ?>
-
 <script type="text/javascript" id="CookieDeclaration" src="<?php print $cookiebot_src; ?>" async="async"></script>
