@@ -28,3 +28,12 @@ function cookiebot_update_7001() {
   variable_set('cookiebot_exclude_admin_theme', FALSE);
   variable_set('cookiebot_exclude_uid_1', FALSE);
 }
+
+/**
+ * Add optout marketing placeholder settings. Enable in settings to show placeholder text.
+ */
+function cookiebot_update_7002() {
+  variable_set('cookiebot_message_placeholder_cookieconsent_optout_marketing_show', FALSE);
+  $cookiebot_message_placeholder_cookieconsent_optout_marketing_text_default = 'Please <a href="!cookiebot_renew" class="cookieconsent-optout-marketing__cookiebot-renew">accept marketing-cookies</a> to view this embedded content from <a href="!cookiebot_from_src_url" target="_blank" class="cookieconsent-optout-marketing__from-src-url">!cookiebot_from_src_url</a>';
+  variable_set('cookiebot_message_placeholder_cookieconsent_optout_marketing', ['value'=> $cookiebot_message_placeholder_cookieconsent_optout_marketing_text_default, 'format' => filter_default_format()]);
+}

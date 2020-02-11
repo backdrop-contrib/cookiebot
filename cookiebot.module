@@ -69,14 +69,20 @@ function cookiebot_permission() {
  * Implements hook_theme().
  */
 function cookiebot_theme($existing, $type, $theme, $path) {
-  return array(
-    'cookiebot_declaration' => array(
+  return [
+    'cookiebot_declaration' => [
       'template' => 'templates/cookiebot-declaration',
-      'variables' => array(
+      'variables' => [
         'cookiebot_src' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+    'cookiebot_blocked_element_placeholder' => [
+      'template' => 'templates/cookiebot-blocked-element-placeholder',
+      'variables' => [
+        'content' => NULL,
+      ],
+    ]
+  ];
 }
 
 /**
@@ -86,7 +92,20 @@ function cookiebot_page_alter(&$page) {
   if (!_cookiebot_visible()) {
     return;
   }
+
+  $cookiebot_message_placeholder_cookieconsent_optout_marketing = variable_get('cookiebot_message_placeholder_cookieconsent_optout_marketing', ['value'=> '', 'format' => filter_default_format()]);
+  $message_placeholder_cookieconsent_optout_marketing_build = [
+    '#theme' => 'cookiebot_blocked_element_placeholder',
+    '#content' => check_markup($cookiebot_message_placeholder_cookieconsent_optout_marketing['value'], $cookiebot_message_placeholder_cookieconsent_optout_marketing['format']),
+  ];
+  drupal_add_js([
+    'cookiebot' => [
+      'message_placeholder_cookieconsent_optout_marketing_show' => variable_get('cookiebot_message_placeholder_cookieconsent_optout_marketing_show') ? TRUE : FALSE,
+      'message_placeholder_cookieconsent_optout_marketing' => drupal_render($message_placeholder_cookieconsent_optout_marketing_build),
+    ],
+  ], 'setting');
   drupal_add_js(drupal_get_path('module', 'cookiebot') . '/js/cookiebot.js');
+  drupal_add_css(drupal_get_path('module', 'cookiebot') . '/css/cookiebot.css', ['every_page' => TRUE]);
 }
 
 function cookiebot_preprocess_html(&$variables)
@@ -249,4 +268,73 @@ function cookiebot_block_view($delta = '') {
   }
 
   return $block;
+}
+
+/**
+ * Implements hook_variable_info().
+ */
+function cookiebot_variable_info($options){
+  $variables['cookiebot_cbid'] = array(
+    'type' => 'string',
+    'title' => t('Your cookiebot Domain Group ID (CBID)', array(), $options),
+    'localize' => FALSE,
+  );
+
+  $variables['cookiebot_block_cookies'] = [
+    'type' => 'boolean',
+    'title' => t('Automatically block all cookies', array(), $options),
+  ];
+
+  $variables['cookiebot_iab_enabled'] = [
+    'type' => 'boolean',
+    'title' => t('Enabling IAB framework', array(), $options),
+  ];
+
+  $variables['cookiebot_show_declaration'] = array(
+    'type' => 'boolean',
+    'title' => t('Show the Cookiebot cookie declaration', array(), $options),
+  );
+
+  $variables['cookiebot_show_declaration_node_id'] = array(
+    'type' => 'string',
+    'title' => t('Node ID', array(), $options),
+    'localize' => TRUE,
+  );
+
+  $variables['cookiebot_exclude_paths'] = [
+    'type' => 'text',
+    'title' => t('Exclude paths', array(), $options),
+    'localize' => TRUE,
+  ];
+
+  $variables['cookiebot_exclude_admin_theme'] = [
+    'type' => 'boolean',
+    'title' => t('Exclude admin pages', array(), $options),
+    'localize' => FALSE,
+  ];
+
+  $variables['cookiebot_exclude_uid_1'] = [
+    'type' => 'boolean',
+    'title' => t('Don’t show the Cookiebot for UID 1.', array(), $options),
+    'localize' => FALSE,
+  ];
+
+  $variables['cookiebot_message_placeholder_cookieconsent_optout_marketing_show'] = [
+    'type' => 'boolean',
+    'title' => t('Show placeholder message for blocked marketing elements', array(), $options),
+    'localize' => FALSE,
+  ];
+
+  $variables['cookiebot_message_placeholder_cookieconsent_optout_marketing'] = [
+    'type' => 'text',
+    'title' => t('Placebolder message for blocked marketing elements', array(), $options),
+    'element' => [
+      '#type' => 'text_format',
+      '#base_type' => 'textarea',
+      '#cardinality' => 1,
+    ],
+    'localize' => TRUE,
+  ];
+
+  return $variable;
 }

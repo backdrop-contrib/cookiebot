@@ -115,6 +115,43 @@ function cookiebot_settings_form($form, &$form_state) {
     '#default_value' => variable_get('cookiebot_exclude_uid_1', FALSE)
   ];
 
+  $form['placeholders'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Placeholders for blocked elements with src attribute (iframe, etc.)'),
+    '#description' => t('Define placeholders for blocked ´src´ elements like iframe, img, audio, video, embed, picture, source. In automatic mode some sources like YouTube iFrames are blocked automatically. In manual mode you have to add the markup yourself. See Cookiebot support <a href="@url1" target="_blank">here</a> and <a href="@url2" target="_blank">here</a> for details.', ['@url1'=>'https://support.cookiebot.com/hc/en-us/articles/360003790854-Iframe-cookie-consent-with-YouTube-example', '@url2' => 'https://support.cookiebot.com/hc/en-us/articles/360003812053-Hide-and-show-content-based-on-the-visitor-s-consent']),
+  ];
+  $form['placeholders']['marketing'] = [
+    '#type' => 'details',
+    '#title' => t('Marketing') . ' ' . '([data-src][data-cookieconsent="marketing"])',
+    '#description' => t('Blocked elements with [data-src][data-cookieconsent="marketing"] attributes. This is typically automatically added by Cookiebot in automatic mode.'),
+  ];
+  $form['placeholders']['marketing']['cookiebot_message_placeholder_cookieconsent_optout_marketing_show'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Show placeholder message for blocked marketing elements'),
+    '#description' => t('Select if you want to show a message for blocked elements like iframes, hidden by cookiebot until marketing consent is given.'),
+    '#default_value' => variable_get('cookiebot_message_placeholder_cookieconsent_optout_marketing_show', FALSE),
+  ];
+
+  $cookiebot_message_placeholder_cookieconsent_optout_marketing = variable_get('cookiebot_message_placeholder_cookieconsent_optout_marketing');
+  $cookiebot_message_placeholder_cookieconsent_optout_marketing_text_default = 'Please <a href="!cookiebot_renew" class="cookieconsent-optout-marketing__cookiebot-renew">accept marketing-cookies</a> to view this embedded content from <a href="!cookiebot_from_src_url" target="_blank" class="cookieconsent-optout-marketing__from-src-url">!cookiebot_from_src_url</a>';
+  $form['placeholders']['marketing']['cookiebot_message_placeholder_cookieconsent_optout_marketing'] = [
+    '#type' => 'text_format',
+    '#title' => t('Placebolder message for blocked marketing elements'),
+    '#default_value' => (!empty($cookiebot_message_placeholder_cookieconsent_optout_marketing) ? $cookiebot_message_placeholder_cookieconsent_optout_marketing['value'] : $cookiebot_message_placeholder_cookieconsent_optout_marketing_text_default),
+    '#required' => FALSE,
+    '#description' => t(
+      "Add this placeholder below the blocked marketing element, if the user has not consented to marketing cookies.<br />Clear to use the default markup.<br />You may use these dynamical placeholders: <ul><li><em>!cookiebot_renew</em> = javascript:Cookiebot.renew()</li><li><em>!cookiebot_from_src_url</em> = iframe data-src attribute value</li></ul>"
+    ),
+    '#format' => (!empty($cookiebot_message_placeholder_cookieconsent_optout_marketing['format']) ? $cookiebot_message_placeholder_cookieconsent_optout_marketing['format'] : filter_default_format()),
+    '#states' => [
+      'visible' => [
+        ':input[name="cookiebot_message_placeholder_cookieconsent_optout_marketing_show"]' => [
+          'checked' => TRUE,
+        ],
+      ],
+    ],
+  ];
+
   return system_settings_form($form);
 }
 

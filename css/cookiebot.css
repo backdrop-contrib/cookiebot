@@ -1,0 +1,52 @@
+.cookieconsent-optout-marketing {
+  background: rgba(0, 0, 0, .65);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  /* Cookiebot sets inline styles - for whatever reason - if the
+  "accept marketing cookies"-link is clicked and the coookie layer
+  is accepted (again) without accepting marketing cookies.
+  So we have to override this the hard way: */
+}
+
+.cookieconsent-optout-marketing[style*="block"] {
+  display: flex !important;
+}
+
+.cookieconsent-optout-marketing__inner {
+  max-width: 100%;
+}
+
+.cookieconsent-optout-marketing a {
+  color: currentColor !important;
+  text-decoration: underline !important;
+}
+
+.cookieconsent-optout-marketing a.cookieconsent-optout-marketing__cookiebot-renew {
+  font-weight: bold;
+}
+
+.cookieconsent-optout-marketing__from-src-url {
+  display: block;
+  max-width: 300px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition-duration: 150ms;
+  transition-property: max-width;
+}
+
+.cookieconsent-optout-marketing:hover .cookieconsent-optout-marketing__from-src-url,
+.cookieconsent-optout-marketing:focus-within .cookieconsent-optout-marketing__from-src-url {
+  max-width: 100%;
+}
+
+.responsive-embed .cookieconsent-optout-marketing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}

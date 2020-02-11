@@ -57,7 +57,7 @@
    * @type {Drupal~behavior}
    */
   Drupal.behaviors.cookiebot = {
-    attach: function attach(context) {
+    attach: function attach(context, settings) {
       Drupal.cookiebot.updateCookies();
 
       $('.cookiebot-renew', context).once().on('click', function (event) {
@@ -65,6 +65,17 @@
 
         $window.trigger(renewConsentTriggerEventName);
       });
+
+      if (settings.cookiebot.message_placeholder_cookieconsent_optout_marketing_show && settings.cookiebot.message_placeholder_cookieconsent_optout_marketing.length > 0) {
+        var message_placeholder_cookieconsent_optout_marketing = settings.cookiebot.message_placeholder_cookieconsent_optout_marketing.replace('!cookiebot_renew', 'javascript:Cookiebot.renew()');
+        $('[data-cookieconsent="marketing"][data-src]').each(function () {
+          var cookiebot_from_src_url = '';
+          if ($(this).attr('data-src').length) {
+            cookiebot_from_src_url = $(this).attr('data-src');
+          }
+          $(this).once('cb-message-placeholder-cookieconsent-optout-marketing').after(message_placeholder_cookieconsent_optout_marketing.replace(new RegExp('!cookiebot_from_src_url', 'g'), cookiebot_from_src_url));
+        });
+      }
     }
   };
 
