@@ -104,6 +104,7 @@ function cookiebot_page_alter(&$page) {
       'message_placeholder_cookieconsent_optout_marketing' => drupal_render($message_placeholder_cookieconsent_optout_marketing_build),
     ],
   ], 'setting');
+  drupal_add_library('system', 'jquery.cookie');
   drupal_add_js(drupal_get_path('module', 'cookiebot') . '/js/cookiebot.js');
   drupal_add_css(drupal_get_path('module', 'cookiebot') . '/css/cookiebot.css', ['every_page' => TRUE]);
 }
