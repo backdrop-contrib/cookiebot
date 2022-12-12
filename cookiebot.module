@@ -337,5 +337,5 @@ function cookiebot_variable_info($options){
     'localize' => TRUE,
   ];
 
-  return $variable;
+  return $variables;
 }
