@@ -1,0 +1,13 @@
+{
+    "_config_name": "cookiebot.settings",
+    "cookiebot_cbid": "",
+    "cookiebot_block_cookies": "",
+    "cookiebot_iab_enabled": "",
+    "cookiebot_show_declaration": false,
+    "cookiebot_show_declaration_node_id": "",
+    "cookiebot_exclude_paths": "",
+    "cookiebot_exclude_admin_theme": false,
+    "cookiebot_exclude_uid_1": false,
+    "cookiebot_message_placeholder_cookieconsent_optout_marketing_show": "",
+    "cookiebot_message_placeholder_cookieconsent_optout_marketing": ""
+}

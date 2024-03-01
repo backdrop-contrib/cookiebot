@@ -3,7 +3,7 @@
  * Cookiebot functionality.
  */
 
-(function ($, Drupal) {
+(function ($, Backdrop) {
   'use strict';
 
   var $window = $(window);
@@ -28,7 +28,7 @@
    * This is also called on every page load when cookies are already accepted.
    */
   $window.on('CookiebotOnAccept', function () {
-    Drupal.cookiebot.updateCookies();
+    Backdrop.cookiebot.updateCookies();
   });
 
   /**
@@ -37,7 +37,7 @@
    * This is also called on every page load when cookies are already declined.
    */
   $window.on('CookiebotOnDecline', function () {
-    Drupal.cookiebot.updateCookies();
+    Backdrop.cookiebot.updateCookies();
   });
 
   /**
@@ -54,11 +54,11 @@
   /**
    * Attach Cookiebot renew click event listener.
    *
-   * @type {Drupal~behavior}
+   * @type {Backdrop~behavior}
    */
-  Drupal.behaviors.cookiebot = {
+  Backdrop.behaviors.cookiebot = {
     attach: function attach(context, settings) {
-      Drupal.cookiebot.updateCookies();
+      Backdrop.cookiebot.updateCookies();
 
       $('.cookiebot-renew', context).once().on('click', function (event) {
         event.preventDefault();
@@ -82,11 +82,11 @@
   /**
    * Updates cookies for Cookiebot.
    *
-   * We set our own cookies to be able to provide integration with other Drupal
+   * We set our own cookies to be able to provide integration with other Backdrop
    * modules, without relying on the cookies of Cookiebot, since those are not
    * part of the public API.
    */
-  Drupal.cookiebot = {
+  Backdrop.cookiebot = {
     updateCookies: function updateCookies() {
       var cookieNames = [
         'necessary',
@@ -118,4 +118,4 @@
     }
   };
 
-})(jQuery, Drupal, window);
+})(jQuery, Backdrop, window);

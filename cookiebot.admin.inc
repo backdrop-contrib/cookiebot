@@ -19,12 +19,14 @@
  * @see system_settings_form_submit()
  */
 function cookiebot_settings_form($form, &$form_state) {
-  $cbid = variable_get('cookiebot_cbid', '');
+  $config = config('cookiebot.settings');
+  $cbid = $config->get('cookiebot_cbid');
 
   if (empty($cbid)) {
-    drupal_set_message(t('Cookiebot functionality is disabled until you enter a valid CBID.'), 'warning');
+    backdrop_set_message(t('Cookiebot functionality is disabled until you enter a valid CBID.'), 'warning');
   }
 
+  $form['#config'] = 'cookiebot.settings';
   $form['cookiebot_cbid'] = array(
     '#type' => 'textfield',
     '#title' => t('Your cookiebot Domain Group ID (CBID)'),
@@ -39,17 +41,17 @@ function cookiebot_settings_form($form, &$form_state) {
       '@automatic_url' => 'https://www.cookiebot.com/en/automatic-cookie-control/',
       '@manual_url' => 'https://www.cookiebot.com/en/manual-implementation/',
     ]),
-    '#default_value' => variable_get('cookiebot_block_cookies', TRUE),
+    '#default_value' => $config->get('cookiebot_block_cookies'),
   ];
 
   $form['cookiebot_iab_enabled'] = [
     '#type' => 'checkbox',
     '#title' => t('Enabling IAB framework'),
     '#description' => t('IAB (Interactive Advertising Bureau) model puts scripts control in the hands of advertisers and vendors by only signaling consent to vendors. More information about <a href="https://support.cookiebot.com/hc/en-us/articles/360007652694-Cookiebot-and-the-IAB-Consent-Framework">Cookiebot and the IAB Consent Framework</a>.'),
-    '#default_value' => variable_get('cookiebot_iab_enabled'),
+    '#default_value' => $config->get('cookiebot_iab_enabled'),
   ];
 
-  $show_declaration = variable_get('cookiebot_show_declaration', FALSE);
+  $show_declaration = $config->get('cookiebot_show_declaration');
 
   $form['cookiebot_declaration'] = array(
     '#type' => 'fieldset',
@@ -77,7 +79,7 @@ function cookiebot_settings_form($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Node ID'),
     '#description' => t('Show the full cookie declaration declaration on the node page with the given ID.'),
-    '#default_value' => variable_get('cookiebot_show_declaration_node_id', ''),
+    '#default_value' => $config->get('cookiebot_show_declaration_node_id'),
     '#states' => array(
       'visible' => array(
         ':input[name="cookiebot_show_declaration"]' => array(
@@ -95,7 +97,7 @@ function cookiebot_settings_form($form, &$form_state) {
   $form['visibility']['cookiebot_exclude_paths'] = [
     '#type' => 'textarea',
     '#title' => t('Exclude paths'),
-    '#default_value' => variable_get('cookiebot_exclude_paths', ''),
+    '#default_value' => $config->get('cookiebot_exclude_paths'),
     '#description' => t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.", [
       '%blog' => '/blog',
       '%blog-wildcard' => '/blog/*',
@@ -106,13 +108,13 @@ function cookiebot_settings_form($form, &$form_state) {
   $form['visibility']['cookiebot_exclude_admin_theme'] = [
     '#type' => 'checkbox',
     '#title' => t('Exclude admin pages'),
-    '#default_value' => variable_get('cookiebot_exclude_admin_theme', FALSE),
+    '#default_value' => $config->get('cookiebot_exclude_admin_theme'),
   ];
 
   $form['visibility']['cookiebot_exclude_uid_1'] = [
     '#type' => 'checkbox',
     '#title' => t('Don’t show the Cookiebot for UID 1.'),
-    '#default_value' => variable_get('cookiebot_exclude_uid_1', FALSE)
+    '#default_value' => $config->get('cookiebot_exclude_uid_1'),
   ];
 
   $form['placeholders'] = [
@@ -129,20 +131,20 @@ function cookiebot_settings_form($form, &$form_state) {
     '#type' => 'checkbox',
     '#title' => t('Show placeholder message for blocked marketing elements'),
     '#description' => t('Select if you want to show a message for blocked elements like iframes, hidden by cookiebot until marketing consent is given.'),
-    '#default_value' => variable_get('cookiebot_message_placeholder_cookieconsent_optout_marketing_show', FALSE),
+    '#default_value' => $config->get('cookiebot_message_placeholder_cookieconsent_optout_marketing_show'),
   ];
 
-  $cookiebot_message_placeholder_cookieconsent_optout_marketing = variable_get('cookiebot_message_placeholder_cookieconsent_optout_marketing');
+  $cookiebot_message_placeholder_cookieconsent_optout_marketing = $config->get('cookiebot_message_placeholder_cookieconsent_optout_marketing');
   $cookiebot_message_placeholder_cookieconsent_optout_marketing_text_default = 'Please <a href="!cookiebot_renew" class="cookieconsent-optout-marketing__cookiebot-renew">accept marketing-cookies</a> to view this embedded content from <a href="!cookiebot_from_src_url" target="_blank" class="cookieconsent-optout-marketing__from-src-url">!cookiebot_from_src_url</a>';
   $form['placeholders']['marketing']['cookiebot_message_placeholder_cookieconsent_optout_marketing'] = [
     '#type' => 'text_format',
     '#title' => t('Placebolder message for blocked marketing elements'),
-    '#default_value' => (!empty($cookiebot_message_placeholder_cookieconsent_optout_marketing) ? $cookiebot_message_placeholder_cookieconsent_optout_marketing['value'] : $cookiebot_message_placeholder_cookieconsent_optout_marketing_text_default),
+    '#default_value' => (isset($cookiebot_message_placeholder_cookieconsent_optout_marketing['value']) ? $cookiebot_message_placeholder_cookieconsent_optout_marketing['value'] : $cookiebot_message_placeholder_cookieconsent_optout_marketing_text_default),
     '#required' => FALSE,
     '#description' => t(
       "Add this placeholder below the blocked marketing element, if the user has not consented to marketing cookies.<br />Clear to use the default markup.<br />You may use these dynamical placeholders: <ul><li><em>!cookiebot_renew</em> = javascript:Cookiebot.renew()</li><li><em>!cookiebot_from_src_url</em> = iframe data-src attribute value</li></ul>"
     ),
-    '#format' => (!empty($cookiebot_message_placeholder_cookieconsent_optout_marketing['format']) ? $cookiebot_message_placeholder_cookieconsent_optout_marketing['format'] : filter_default_format()),
+    '#format' => (isset($cookiebot_message_placeholder_cookieconsent_optout_marketing['format']) ? $cookiebot_message_placeholder_cookieconsent_optout_marketing['format'] : filter_default_format()),
     '#states' => [
       'visible' => [
         ':input[name="cookiebot_message_placeholder_cookieconsent_optout_marketing_show"]' => [
@@ -176,7 +178,7 @@ function cookiebot_settings_form_validate($form, &$form_state) {
   }
 
   // Clear caches like the system_performance_settings() form does.
-  drupal_clear_css_cache();
-  drupal_clear_js_cache();
+  backdrop_clear_css_cache();
+  backdrop_clear_js_cache();
   cache_clear_all('*', 'cache_page', TRUE);
 }

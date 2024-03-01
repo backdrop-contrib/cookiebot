@@ -25,20 +25,7 @@ development of this module.
 
 Then, grab your _Domain Group ID_ (CBID) from the 'Your scripts' tab.
 
-This module will only run with jQuery 1.9 and higher and thus needs the
-jQuery Update module.
-
-## INSTALLATION
-
-Install this as any other Drupal module
-([help](https://www.drupal.org/docs/7/extend/installing-modules)).
-
-When using composer, run the following command from your project root:
-
-`composer require drupal/cookiebot`
-
-Then either use `drush en cookiebot` from the command line or enable the module
-via the 'Modules' admin interface.
+This module will only run with jQuery 1.9 and higher.
 
 ## CONFIGURATION
 

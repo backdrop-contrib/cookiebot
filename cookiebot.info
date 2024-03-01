@@ -1,6 +1,6 @@
-name           = Cookiebot
-description    = Drupal Cookiebot integration. Cookie consent, Cookie monitoring and Cookie control.
-core           = 7.x
-configure      = admin/config/system/cookiebot
-dependencies[] = jquery_update
+name = Cookiebot
+description = Drupal Cookiebot integration. Cookie consent, Cookie monitoring and Cookie control.
+backdrop = 1.x
+type = module
+configure = admin/config/system/cookiebot
 

@@ -6,34 +6,37 @@
  */
 
 /**
- * Implements hook_uninstall().
+ * Implements hook_update_last_removed().
  */
-function cookiebot_uninstall() {
-  db_delete('variable')
-    ->condition('name', db_like('cookiebot') . '%', 'LIKE')
-    ->execute();
-
-  cache_clear_all('variables', 'cache_bootstrap');
-}
-
-
-/**
- * Update configuration keys.
- */
-function cookiebot_update_7001() {
-   // Set defaults for new variables
-  variable_set('cookiebot_block_cookies', TRUE);
-  variable_set('cookiebot_iab_enabled', FALSE);
-  variable_set('cookiebot_exclude_paths', '');
-  variable_set('cookiebot_exclude_admin_theme', FALSE);
-  variable_set('cookiebot_exclude_uid_1', FALSE);
+function cookiebot_update_last_removed() {
+  return 7002;
 }
 
 /**
- * Add optout marketing placeholder settings. Enable in settings to show placeholder text.
+ * Migrate cookiebot variables to config.
  */
-function cookiebot_update_7002() {
-  variable_set('cookiebot_message_placeholder_cookieconsent_optout_marketing_show', FALSE);
-  $cookiebot_message_placeholder_cookieconsent_optout_marketing_text_default = 'Please <a href="!cookiebot_renew" class="cookieconsent-optout-marketing__cookiebot-renew">accept marketing-cookies</a> to view this embedded content from <a href="!cookiebot_from_src_url" target="_blank" class="cookieconsent-optout-marketing__from-src-url">!cookiebot_from_src_url</a>';
-  variable_set('cookiebot_message_placeholder_cookieconsent_optout_marketing', ['value'=> $cookiebot_message_placeholder_cookieconsent_optout_marketing_text_default, 'format' => filter_default_format()]);
+function cookiebot_update_1000() {
+  $config = config('cookiebot.settings');
+  $config->set('cookiebot_cbid', update_variable_get('cookiebot_cbid', ''));
+  $config->set('cookiebot_block_cookies', update_variable_get('cookiebot_block_cookies', ''));
+  $config->set('cookiebot_iab_enabled', update_variable_get('cookiebot_iab_enabled', ''));
+  $config->set('cookiebot_show_declaration', update_variable_get('cookiebot_show_declaration', array()));
+  $config->set('cookiebot_show_declaration_node_id', update_variable_get('cookiebot_show_declaration_node_id', ''));
+  $config->set('cookiebot_exclude_paths', update_variable_get('cookiebot_exclude_paths', ''));
+  $config->set('cookiebot_exclude_admin_theme', update_variable_get('cookiebot_exclude_admin_theme', array()));
+  $config->set('cookiebot_exclude_uid_1', update_variable_get('cookiebot_exclude_uid_1', array()));
+  $config->set('cookiebot_message_placeholder_cookieconsent_optout_marketing_show', update_variable_get('cookiebot_message_placeholder_cookieconsent_optout_marketing_show', ''));
+  $config->set('cookiebot_message_placeholder_cookieconsent_optout_marketing', update_variable_get('cookiebot_message_placeholder_cookieconsent_optout_marketing', 'dynamic value in file /cookiebot/cookiebot.module line 96'));
+  $config->save();
+
+  update_variable_del('cookiebot_cbid');
+  update_variable_del('cookiebot_block_cookies');
+  update_variable_del('cookiebot_iab_enabled');
+  update_variable_del('cookiebot_show_declaration');
+  update_variable_del('cookiebot_show_declaration_node_id');
+  update_variable_del('cookiebot_exclude_paths');
+  update_variable_del('cookiebot_exclude_admin_theme');
+  update_variable_del('cookiebot_exclude_uid_1');
+  update_variable_del('cookiebot_message_placeholder_cookieconsent_optout_marketing_show');
+  update_variable_del('cookiebot_message_placeholder_cookieconsent_optout_marketing');
 }
